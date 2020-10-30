@@ -59,9 +59,9 @@ module.exports = {
             }
          } 
       }
-      catch (error) {
-         console.log(error);
-         res.status(500).json(error);
+      catch (err) {
+         console.error(err);
+         res.status(500).json(err);
       }
       
    },

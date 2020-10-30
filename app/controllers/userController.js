@@ -66,7 +66,7 @@ const userController  = {
       }
       catch(error) {
          console.log(error.details[0].message);
-         res.status(500).send(error);
+         res.status(500).json(error.details[0].message);
       }
    },
 
