@@ -39,10 +39,7 @@ const userController  = {
       try {
          const userId = req.params.id;
          const user = await User.findByPk(userId);
-         if(req.session.admin) {
-            console.log(req.session)
-            console.log("Bienvenue " + user.firstname)
-         }
+       
          res.json(user);
       }
       catch (error){

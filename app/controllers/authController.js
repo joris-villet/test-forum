@@ -1,33 +1,15 @@
-const jwt = require('jsonwebtoken');
+// const jwt = require('jsonwebtoken');
 const bcrypt = require('bcrypt');
 
 const User = require('../models/User')
 
-module.exports = {
 
-   signup_get: (req, res) => {
-      res.json('signup');
-   },
+const authController = {
+
    
-   login_get: (req, res) => {
-      res.json('login');
-   },
+   loginPost: async (req, res) => {
    
-   signup_post: async (req, res) => {
-      const { email, password } = req.body;
-   
-      try {
-         const user = await User.create({ email, password })
-         res.status(201).json(user);
-      }
-      catch (error) {
-         console.log(error);
-         res.status(400).send("erreur, user not created");
-      }
-   },
-   
-   login_post: async (req, res) => {
-   
+      
       try {
          const { email, password } = req.body;
       
@@ -38,7 +20,7 @@ module.exports = {
          });
    
          if(targetUser.length === 0){
-            return res.status(500).json("email non enregistré")
+            return res.status(500).json("email ou mot de passe incorrect")
          }
    
          if(email === targetUser[0].email){
@@ -46,13 +28,13 @@ module.exports = {
             const targetPassword = await bcrypt.compareSync(password, targetUser[0].password)
          
             if(!targetPassword){
-               return res.status(500).json("password incorrect")
+               return res.status(500).json("email ou mot de passe incorrect")
             }
             else {
-               req.session.admin = email;
+               req.session.admin;
                console.log(req.session)
                console.log(req.session.admin)
-               return res.json("password correct")
+               return res.json(req.session)
                // ici les tokens
                // pour générer une clé secrète on peut utiliser le module crypto directement dans le terminal avec node -i
                // crypto.randomBytes(64).toString('hex')
@@ -80,3 +62,4 @@ module.exports = {
 
 }
 
+module.exports = authController;

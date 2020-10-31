@@ -1,11 +1,8 @@
 const express = require('express');
 const router = express.Router();
 
-
-const mainController = require('./controllers/mainController');
 const userController = require('./controllers/userController');
 const topicController = require('./controllers/topicController');
-
 
 
 router.route('/user')
@@ -26,7 +23,7 @@ router.route('/topic/:id')
    .put(topicController.updateTopic)
    .delete(topicController.deleteTopic)   
 
-router.use(mainController.notFound);
+
 
 
 module.exports = router;

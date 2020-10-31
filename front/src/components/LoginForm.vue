@@ -18,6 +18,7 @@
 </template>
 
 <script>
+
 import axios from 'axios'
 
 export default {
@@ -30,7 +31,6 @@ export default {
       message: ''
     }
   },
-
    methods: {
     getFormRegister() {
      
@@ -41,9 +41,7 @@ export default {
       .then(response => {
         this.infoPage = true
         this.message = response.data
-        setTimeout(() => {
-          this.$router.push('/')
-        },3000)
+        this.$router.push('/')
       })
       .catch(error => {
         console.log(error.response)
@@ -51,7 +49,8 @@ export default {
         this.message = error.response.data;
       })
       
-    }
+    },
+  
   }
 }
 </script>

@@ -5,11 +5,23 @@ if(process.env.NODE_ENV !== 'production'){
 const express = require('express');
 const app = express();
 
-const session = require('express-session');
+const mainController = require('./app/controllers/mainController');
 
-app.use(session ({
+// const session = require('express-session');
+
+// app.use(session ({
+//   secret: 'keyboard cat',
+//   resave: false,
+//   saveUninitialized: true,
+//   httpOnly: true,
+//   secure: false,
+//   maxAge: null
+// }));
+
+const cookieSession = require('cookie-session');
+app.use(cookieSession({
+  name: 'session',
   secret: 'keyboard cat',
-  resave: false,
   saveUninitialized: true,
   httpOnly: true,
   secure: false,
@@ -23,12 +35,13 @@ app.use(cors());
 // app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 
-
 const router = require('./app/router');
 app.use('/api',router);
 
 const authRouter = require('./app/authRouter');
 app.use('/api', authRouter);
+
+app.use(mainController.notFound);
 
 
 const port = process.env.PORT || 5000;
