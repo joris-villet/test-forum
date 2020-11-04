@@ -1,25 +1,14 @@
 <template>
+  <transition name="fade">
+    <div class="bloc-modale" v-if="seen">
 
-<transition name="fade">
-  <div class="bloc-modale" v-if="revele">
+      <div class="overlay"></div>
 
-    <div class="overlay"></div>
-
-      <form class="modale" @submit.prevent="getFormRegister">
-        <div class="close-modale" @click="toggleModaleRegister">
+      <form class="modale" @submit.prevent="getFormLogin">
+        <div class="close-modale" @click="toggleModale">
           <i class="fas fa-window-close close-modale-icon"></i>
         </div>
-        <h2 class="title-modale">&#x1F447; Inscription</h2>
-        <div>
-          <label>
-            <input v-model="firstname" type="text" name="firstname" placeholder="votre prénom" autocomplete="off">
-          </label>
-        </div>
-        <div>
-          <label>
-            <input v-model="lastname" type="text" name="lastname" placeholder="votre nom" autocomplete="off">
-          </label>
-        </div>
+        <h2 class="title-modale">&#x1F447; Connexion</h2>
         <div>
           <label>
             <input v-model="email" type="text" name="email" placeholder="votre email" autocomplete="off">
@@ -30,56 +19,42 @@
             <input v-model="password" type="password" name="password" placeholder="votre mot de passe" autocomplete="off">
           </label>
         </div>
-        <div>
-          <label>
-            <input v-model="repeatPassword" type="password" name="repeatPassword" placeholder="confirmez le mot de passe" autocomplete="off">
-          </label>
-        </div>
         <button class="btn" type="submit">Validez</button>
         <p class="error-message" v-if="infoModale"> {{ message }} </p>
       </form>
+    </div>
+  </transition>
 
-  </div>
-</transition>
-  
 </template>
 
 <script>
+
 import axios from 'axios'
 
 export default {
-  name: 'ModaleRegister',
+  name: 'ModaleLogin',
    data() {
     return {
-      firstname: '',
-      lastname: '',
       email: '',
       password: '',
-      repeatPassword: '',
       infoModale: false,
-      message: '',
+      message: ''
     }
   },
-  props: ['toggleModaleRegister', 'revele'],
-
-   methods: {
-    getFormRegister: function() {
-      
-      axios.post('http://localhost:3000/api/user', {
-        firstname: this.firstname,
-        lastname: this.lastname,
+  props: ['toggleModale', 'seen'],
+  methods: {
+    getFormLogin() {
+     
+      axios.post('http://localhost:3000/api/login', {
         email: this.email,
         password: this.password,
-        repeatPassword: this.repeatPassword
       })
       .then(response => {
         console.log(response.data)
-        this.revele = !this.revele;
-        this.firstname = '';
-        this.lastname =  '';
+        this.infoModale = true;
+        this.seen = false;
         this.email = '';
-        this.password =  '';
-        this.repeatPassword =  '';
+        this.password = '';
       })
       .catch(error => {
         console.log(error.response)
@@ -87,11 +62,16 @@ export default {
         this.message = error.response.data;
       })
     },
+  
   }
 }
 </script>
 
 <style lang="css" scoped>
+  input {
+    display: block;
+    margin: 0.8rem auto;
+  }
 
   .close-modale {
     position: absolute;
@@ -161,12 +141,12 @@ export default {
     left: 50%;
     transform: translate(-50%, -50%);
     max-width: 300px;
-    height: 350px;
+    height: 230px;
     background: #f1f1f1;
     border-radius: 5px;
     box-shadow: 5px 5px 20px rgba(0,0,0,0.2);
     padding: 3rem 5rem;
-  }
+  } 
 
   .btn {
     background: rgb(54, 194, 129);
@@ -187,7 +167,7 @@ export default {
     font-size: 0.8rem;
   }
 
-   /* transition */
+  /* transition */
   .fade-enter-active, .fade-leave-active {
     transition: all .3s ease-in-out;
   }

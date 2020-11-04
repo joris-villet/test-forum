@@ -2,19 +2,19 @@
 <div>
   <nav>
     <ul>
-      <li @click="toggleModale">
+      <li @click="toggleModaleRegister">
         S'inscrire
       </li>
       <li v-if="admin">
         Se déconnecter
       </li>
-      <li v-else>
+      <li v-else @click="toggleModale">
         Se connecter
       </li>
     </ul>
   </nav>
 
-  <!-- ici ma modale -->
+  <!-- ici ma modale d'inscription -->
   <modale-register
     :getFormRegister="getFormRegister"
     :firstname="firstname"
@@ -23,9 +23,19 @@
     :password="password"
     :repeatPassword="repeatPassword"
     :revele="revele"
-    :toggleModale="toggleModale"
+    :toggleModaleRegister="toggleModaleRegister"
   >
   </modale-register> 
+
+  <!-- ici ma modale de connexion -->
+   <modale-login
+    :getFormLogin="getFormLogin"
+    :email="email" 
+    :password="password"
+    :seen="seen"
+    :toggleModale="toggleModale"
+    >
+  </modale-login> 
 
 
 
@@ -36,20 +46,24 @@
 
 <script>
 import ModaleRegister from '../components/ModaleRegister'
+import ModaleLogin from '../components/ModaleLogin'
 
 export default {
   name: 'NavBar',
   components: {
-    'modale-register': ModaleRegister
+    'modale-register': ModaleRegister,
+    'modale-login': ModaleLogin
   },
   data() {
     return {
       admin: false,
-      revele: false
+      revele: false,
+      seen: false
     }
   },
   props: {
     getFormRegister: Function,
+    getFormLogin: Function,
     firstname: String,
     lastname: String,
     email: String,
@@ -59,8 +73,12 @@ export default {
 
   methods: {
 
-    toggleModale: function(){
+    toggleModaleRegister: function(){
       this.revele = !this.revele;
+    },
+
+    toggleModale: function(){
+      this.seen = !this.seen;
     },
   },
 }
