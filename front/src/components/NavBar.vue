@@ -1,47 +1,42 @@
 <template>
-<div>
-  <nav>
-    <ul>
-      <li @click="toggleModaleRegister">
-        S'inscrire
-      </li>
-      <li v-if="admin">
-        Se déconnecter
-      </li>
-      <li v-else @click="toggleModale">
-        Se connecter
-      </li>
-    </ul>
-  </nav>
+  <div>
+    <nav>
+      <ul>
+        <li @click="openModalRegister">
+          S'inscrire
+        </li>
+        <li v-if="admin">
+          Se déconnecter
+        </li>
+        <li v-else @click="openModalLogin">
+          Se connecter
+        </li>
+      </ul>
+    </nav>
 
-  <!-- ici ma modale d'inscription -->
-  <modale-register
-    :getFormRegister="getFormRegister"
-    :firstname="firstname"
-    :lastname="lastname" 
-    :email="email" 
-    :password="password"
-    :repeatPassword="repeatPassword"
-    :revele="revele"
-    :toggleModaleRegister="toggleModaleRegister"
-  >
-  </modale-register> 
-
-  <!-- ici ma modale de connexion -->
-   <modale-login
-    :getFormLogin="getFormLogin"
-    :email="email" 
-    :password="password"
-    :seen="seen"
-    :toggleModale="toggleModale"
-    >
-  </modale-login> 
+    <!-- ici ma modale d'inscription -->
+    <ModaleRegister
+      :getFormRegister="getFormRegister"
+      :firstname="firstname"
+      :lastname="lastname" 
+      :email="email" 
+      :password="password"
+      :repeatPassword="repeatPassword"
+      :revele="revele"
+      @closeModalRegister="closeModalRegister"
+    />
 
 
-
-
-
-</div>
+    <!-- ici ma modale de connexion -->
+    <ModaleLogin
+      :email="email" 
+      :password="password"
+      :seen="seen"
+      @closeModalLogin="closeModalLogin"
+    />
+  
+    
+  </div>
 </template>
 
 <script>
@@ -50,10 +45,7 @@ import ModaleLogin from '../components/ModaleLogin'
 
 export default {
   name: 'NavBar',
-  components: {
-    'modale-register': ModaleRegister,
-    'modale-login': ModaleLogin
-  },
+  components: { ModaleRegister, ModaleLogin },
   data() {
     return {
       admin: false,
@@ -72,13 +64,17 @@ export default {
   },
 
   methods: {
-
-    toggleModaleRegister: function(){
-      this.revele = !this.revele;
+    openModalRegister: function() {
+      this.revele = true;
     },
-
-    toggleModale: function(){
-      this.seen = !this.seen;
+    closeModalRegister: function(){
+      this.revele = false;
+    },
+    openModalLogin: function() {
+      this.seen = true;
+    },
+    closeModalLogin: function() {
+      this.seen = false;
     },
   },
 }

@@ -19,7 +19,7 @@ CREATE TABLE api_topic (
 	message text NOT NULL,
 	created_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
   	updated_at TIMESTAMPTZ NULL,
-	user_id int NOT NULL REFERENCES api_user(id)
+	user_id int REFERENCES api_user(id)
 );
 
 CREATE TABLE api_message (

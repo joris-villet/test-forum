@@ -1,131 +1,147 @@
 <template>
-<div class="home">
-  <div class="container">
+  <div class="home">
+    <div class="container">
+      <NavBar />
+      <div class="profil">
+        <div v-if="profilActived">
 
-    <nav-bar></nav-bar>
-
-    <h1 class="title-main">Liste Forum</h1>
-
-    <div class="header-forum">
-      <div @click="createNewTopic" class="add-topic">
-        <h2 class="title-newTopic">Créer un topic</h2>
-        <i class="fas fa-edit new-topic-icon"></i>
+        </div>
       </div>
-    </div>
+      <h1 class="title-main">Liste Forum</h1>
 
-    <transition name="fade">
-      <div v-if="revele">
-        <form class="form-new-topic">
-          <div class="close-modale" @click="toggleModale">
-            <i class="fas fa-window-close close-modale-icon"></i>
-          </div>
-          <div>
-            <label for="title-topic">Titre du topic</label>
-          </div>
-          <div>
-            <input type="text" id="title-topic" name="title-topic">
-          </div>
-          <div>
-            <label for="message-topic">Votre message</label>
-          </div>
-          <div>
-            <textarea type="text" id="message-topic" name="message-topic"></textarea>
-          </div>
-          <button class="btn" type="submit">Validez</button>
-        </form>
+      <div class="header-forum">
+        <div @click="openFormTopic" class="add-topic">
+          <h2 class="title-newTopic">Créer un topic</h2>
+          <i class="fas fa-edit new-topic-icon"></i>
+        </div>
       </div>
-    </transition>
 
-    <ul class="topics">
-      <li v-for="(topic, index) in topics" :key="index">
-        <todo-list
+      <transition name="fade">
+        <div v-if="revele">
+          <form class="form-new-topic">
+            <div class="close-modale" @click="closeFormTopic">
+              <i class="fas fa-window-close close-modale-icon"></i>
+            </div>
+            <div>
+              <label for="title-topic">Titre du topic: {{ titleVoid }}</label>
+            </div>
+            <div>
+              <input v-model="titleTopic" type="text" id="title-topic" name="title-topic">
+            </div>
+            <div>
+              <label for="message-topic">Votre message: {{ messageVoid }}</label>
+            </div>
+            <div>
+              <textarea v-model="messageTopic" type="text" id="message-topic" name="message-topic"></textarea>
+            </div>
+            <button @click.prevent="submitTopic" class="btn" type="submit">Validez</button>
+          </form>
+        </div>
+      </transition>
+
+      <div class="container-todo">
+        <TodoList
+          v-for="(topic, index) in topics" :key="index"
+          :createdAt="topic.createdAt"
           :title="topic.title"
           :message="topic.message"
-        >
-        </todo-list>
-      </li>
-    </ul>
-    
+        />
+      </div>
 
-  </div><!-- fin container -->
-
-</div>
+    </div><!-- fin container -->
+  </div>
 </template>
 
 <script>
 import axios from 'axios'
-// @ is an alias to /src
-import NavBar from '../components/NavBar'
-import TodoList from '../components/TodoList'
+import NavBar from '@/components/NavBar'
+import TodoList from '@/components/TodoList'
 
 export default {
   name: 'Home',
-
-  components: {
-    'nav-bar': NavBar,
-    'todo-list': TodoList
-  },
-
-  data(){
+  components: { NavBar, TodoList },
+  data() {
     return {
+      profilActived: true,
       revele: false,
+      titleTopic: '',
+      messageTopic: '',
+      titleVoid: '',
+      messageVoid: '',
       topics: []
     }
   },
-  mounted() { 
-    console.log(this.topics)
-    this.getTopics()
+  created() {
+    this.getTopics();
   },
-
   methods: {
-    
-    createNewTopic: function(){
-      this.revele = true
+    openFormTopic: function() {
+      this.revele = true;
     },
-
-    toggleModale: function(){
-      this.revele = false
+    closeFormTopic: function() {
+      this.revele = false;
     },
+    submitTopic: async function() {
 
-    getTopics: function(){
-      axios.get('http://localhost:3000/api/topic')
-        .then(res => {
-            res.data.forEach(item => {
-           
-              const topic = {
-                title: item.title,
-                message: item.message
-              }
+      if (this.titleTopic === '') {
+        this.titleVoid = 'Veuillez entrer un titre';
+        return;
+      }
+      if (this.messageTopic === '') {
+        this.messageVoid = 'Veuillez entre un message';
+        return;
+      }
 
-              this.topics.push(topic)
-              
-                
-                // message: this.message.push(item.message)
-              
-            })
-        })
-        .catch(error => {
-          console.log(error.response)
-      })
+      const newTopic = {
+        title: this.titleTopic,
+        message: this.messageTopic
+      };
+
+      try {
+        const res = await axios.post('http://localhost:3000/api/topic', newTopic);
+        const data = await res.data;
+        console.log(data);
+        this.topics.unshift(data)
+      }
+      catch (err) {
+        console.log(err)
+      }
+
+      this.titleTopic = '';
+      this.messageTopic = '';
+      this.titleVoid = '',
+      this.revele = false;
+
+    },
+    getTopics: async function() {
+      try {
+        const res = await axios.get('http://localhost:3000/api/topic');
+        const data = await res.data;
+        console.log(data);
+        this.topics = data;
+      }
+      catch (err) {
+        console.log(err);
+      }
     }
   }
 }
 </script>
 
-<style>
+<style scoped>
 
   .container {
     max-width: 1200px;
     margin: 0 auto;
   }
 
-  .title-main {
-    color: rgb(139, 139, 139);
+  .container-todo {
+    margin: 1rem auto;
+    transition: .5s ease-in-out;
   }
 
-  .topics {
-    list-style-type: none;
-    padding: 0;
+  .title-main {
+    color: rgb(139, 139, 139);
   }
 
   .header-forum {
@@ -135,6 +151,8 @@ export default {
     box-shadow: 2px 2px 2px rgba(0,0,0,0.3);
     max-width: 100%;
     padding: 1rem;
+    position: relative;
+    z-index: 1;
   }
 
   .title-newTopic {
@@ -157,9 +175,9 @@ export default {
 
   .add-topic {
     display: flex;
-    justify-content: space-evenly;
+    justify-content: space-between;
     align-items: center;
-    width: 15%;
+    width: 140px;
     cursor: pointer;
   }
 
@@ -176,6 +194,7 @@ export default {
     border-top: 2px solid rgb(54, 194, 129);
     border-radius: 2px;
     box-shadow: 2px 2px 2px rgba(0,0,0,0.3);
+    z-index: 0;
   }
 
   #title-topic, #message-topic {
@@ -225,6 +244,7 @@ export default {
 
   .fade-enter, .fade-leave-to /* .fade-leave-active below version 2.1.8 */ {
     opacity: 0;
+    transform: translateY(-89px);
   }
 
 </style>

@@ -4,8 +4,8 @@
 
       <div class="overlay"></div>
 
-      <form class="modale" @submit.prevent="getFormLogin">
-        <div class="close-modale" @click="toggleModale">
+      <form class="modale">
+        <div class="close-modale" @click="$emit('closeModalLogin', $event.target)">
           <i class="fas fa-window-close close-modale-icon"></i>
         </div>
         <h2 class="title-modale">&#x1F447; Connexion</h2>
@@ -19,7 +19,7 @@
             <input v-model="password" type="password" name="password" placeholder="votre mot de passe" autocomplete="off">
           </label>
         </div>
-        <button class="btn" type="submit">Validez</button>
+        <button @click.prevent="submitForm" class="btn" type="submit">Validez</button>
         <p class="error-message" v-if="infoModale"> {{ message }} </p>
       </form>
     </div>
@@ -28,46 +28,50 @@
 </template>
 
 <script>
-
 import axios from 'axios'
 
 export default {
   name: 'ModaleLogin',
-   data() {
+  props: {
+    seen: Boolean
+  },
+  data() {
     return {
       email: '',
       password: '',
       infoModale: false,
-      message: ''
+      message: '',
     }
   },
-  props: ['toggleModale', 'seen'],
   methods: {
-    getFormLogin() {
-     
-      axios.post('http://localhost:3000/api/login', {
+    submitForm: async function() {
+      const formData = {
         email: this.email,
         password: this.password,
-      })
-      .then(response => {
-        console.log(response.data)
-        this.infoModale = true;
+      }
+      try {
+        const res = await axios.post('http://localhost:3000/api/login', formData);
+        const data = await res.data;
+        console.log(data)
+        // this.infoModale = true;
         this.seen = false;
         this.email = '';
         this.password = '';
-      })
-      .catch(error => {
-        console.log(error.response)
+      }
+      catch (err) {
+        console.log("je suis dans le catch")
+        console.log(err);
+        console.log(err.response)
         this.infoModale = true;
-        this.message = error.response.data;
-      })
-    },
-  
+        this.message = err.response.data;
+      }
+      
+    }
   }
 }
 </script>
 
-<style lang="css" scoped>
+<style scoped>
   input {
     display: block;
     margin: 0.8rem auto;
@@ -96,9 +100,9 @@ export default {
   input {
     display: block;
     margin: 0.8rem auto;
-    padding-left: 0.5rem;
+    padding: 1rem 0rem 0 0.5rem;
     width: 250px;
-    height: 30px;
+    height: auto;
     outline: none;
     border: 1px solid rgb(208, 208, 208);
     border-radius: 5px;
@@ -115,7 +119,7 @@ export default {
   }
 
   .bloc-modale {
-    z-index: 1;
+    z-index: 2;
     position: fixed;
     top: 0;
     left: 0;
@@ -140,8 +144,8 @@ export default {
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
-    max-width: 300px;
-    height: 230px;
+    width: auto;
+    height: auto;
     background: #f1f1f1;
     border-radius: 5px;
     box-shadow: 5px 5px 20px rgba(0,0,0,0.2);

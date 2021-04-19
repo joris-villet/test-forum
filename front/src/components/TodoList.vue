@@ -1,5 +1,6 @@
 <template>
     <div class="bloc-todo">
+        <h5 class="text-sm italic text-gray-400 text-left">Posté le: {{ createdAt }}</h5>
         <h2 class="title">{{ title }}</h2>
         <p class="message">{{ message }}</p>
     </div>
@@ -8,7 +9,11 @@
 <script>
     export default {
         name: 'TodoList',
-        props: ['title', 'message'],
+        props: {
+            title: String,
+            message: String,
+            createdAt: String
+        }
     }
 </script>
 
@@ -23,14 +28,14 @@
     }
 
     .title {
-        margin: 0rem 0 1rem 1rem;
+        margin: 0;
         font-size: 1.3rem;
         text-align: left;
         color: rgb(139, 139, 139);
     }
 
     .message {
-        margin: 1rem;
+        margin: 1rem auto;
         font-size: 0.9rem;
         text-align: left;
         color: rgb(139, 139, 139);

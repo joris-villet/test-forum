@@ -5,8 +5,8 @@
 
     <div class="overlay"></div>
 
-      <form class="modale" @submit.prevent="getFormRegister">
-        <div class="close-modale" @click="toggleModaleRegister">
+      <form class="modale">
+        <div class="close-modale" @click="$emit('closeModalRegister', $event.target)">
           <i class="fas fa-window-close close-modale-icon"></i>
         </div>
         <h2 class="title-modale">&#x1F447; Inscription</h2>
@@ -35,7 +35,7 @@
             <input v-model="repeatPassword" type="password" name="repeatPassword" placeholder="confirmez le mot de passe" autocomplete="off">
           </label>
         </div>
-        <button class="btn" type="submit">Validez</button>
+        <button @click.prevent="submitFormRegister" class="btn" type="submit">Validez</button>
         <p class="error-message" v-if="infoModale"> {{ message }} </p>
       </form>
 
@@ -49,7 +49,10 @@ import axios from 'axios'
 
 export default {
   name: 'ModaleRegister',
-   data() {
+  props: {
+    revele: Boolean
+  },
+  data() {
     return {
       firstname: '',
       lastname: '',
@@ -60,38 +63,62 @@ export default {
       message: '',
     }
   },
-  props: ['toggleModaleRegister', 'revele'],
-
    methods: {
-    getFormRegister: function() {
+     submitFormRegister: async function() {
+        const formData = {
+          firstname: this.firstname,
+          lastname: this.lastname,
+          email: this.email,
+          password: this.password,
+          repeatPassword: this.repeatPassword
+        }
+
+        try {
+          const res = await axios.post('http://localhost:3000/api/user', formData);
+          const data = await res.data;
+          console.log(data)
+          this.revele = true;
+          this.firstname = '';
+          this.lastname =  '';
+          this.email = '';
+          this.password =  '';
+          this.repeatPassword =  '';
+        }
+        catch (err) {
+          console.log("je suis dans le catch")
+          console.log(err);
+          console.log(err.response)
+        }
+     }
+    // getFormRegister: function() {
       
-      axios.post('http://localhost:3000/api/user', {
-        firstname: this.firstname,
-        lastname: this.lastname,
-        email: this.email,
-        password: this.password,
-        repeatPassword: this.repeatPassword
-      })
-      .then(response => {
-        console.log(response.data)
-        this.revele = !this.revele;
-        this.firstname = '';
-        this.lastname =  '';
-        this.email = '';
-        this.password =  '';
-        this.repeatPassword =  '';
-      })
-      .catch(error => {
-        console.log(error.response)
-        this.infoModale = true;
-        this.message = error.response.data;
-      })
-    },
+    //   axios.post('http://localhost:3000/api/user', {
+    //     firstname: this.firstname,
+    //     lastname: this.lastname,
+    //     email: this.email,
+    //     password: this.password,
+    //     repeatPassword: this.repeatPassword
+    //   })
+    //   .then(response => {
+    //     console.log(response.data)
+    //     this.revele = !this.revele;
+    //     this.firstname = '';
+    //     this.lastname =  '';
+    //     this.email = '';
+    //     this.password =  '';
+    //     this.repeatPassword =  '';
+    //   })
+    //   .catch(error => {
+    //     console.log(error.response)
+    //     this.infoModale = true;
+    //     this.message = error.response.data;
+    //   })
+    // },
   }
 }
 </script>
 
-<style lang="css" scoped>
+<style scoped>
 
   .close-modale {
     position: absolute;
@@ -116,9 +143,9 @@ export default {
   input {
     display: block;
     margin: 0.8rem auto;
-    padding-left: 0.5rem;
+    padding: 1rem 0rem 0 0.5rem;
     width: 250px;
-    height: 30px;
+    height: auto;
     outline: none;
     border: 1px solid rgb(208, 208, 208);
     border-radius: 5px;
@@ -135,7 +162,7 @@ export default {
   }
 
   .bloc-modale {
-    z-index: 1;
+    z-index: 2;
     position: fixed;
     top: 0;
     left: 0;
@@ -160,8 +187,8 @@ export default {
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
-    max-width: 300px;
-    height: 350px;
+    width: auto;
+    height: auto;
     background: #f1f1f1;
     border-radius: 5px;
     box-shadow: 5px 5px 20px rgba(0,0,0,0.2);

@@ -5,7 +5,12 @@ const topicController = {
    //READ ALL
    getAllTopic: async (req, res, next) => {
       try {
-         const topics = await Topic.findAll();
+         // const topics = await Topic.findAll();
+         const topics = await Topic.findAll({
+            order: [
+               ['createdAt', 'DESC'],
+            ]
+         });
          res.json(topics);
       }
       catch (error) {

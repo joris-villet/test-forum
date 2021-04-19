@@ -4,13 +4,13 @@
 // MODELS
 const User = require('../models/User');
 
-const userSchema = require('../validation');
+const { userSchema } = require('../validation');
 
 const bcrypt = require('bcrypt');
+const Joi = require('joi');
 
 const moment = require('moment');
 moment.locale('fr');
-
 
 
 const userController  = {
@@ -22,7 +22,7 @@ const userController  = {
 
          /* requête brute d'une view crée (voir migrations/deploy/views.sql) */
          //const users = await User.sequelize.query('SELECT * FROM v_user_with_french_date');
-         date = User.currentDate
+         let date = User.currentDate
          res.json({
             users,
             date
@@ -39,7 +39,6 @@ const userController  = {
       try {
          const userId = req.params.id;
          const user = await User.findByPk(userId);
-       
          res.json(user);
       }
       catch (error){
@@ -52,35 +51,32 @@ const userController  = {
    // Create
    create: async (req, res, next) => {
       try {
-
-         await userSchema.validateAsync(req.body)
+         const formValid = Joi.valid(req.body);
+         console.log(formValid)
 
          req.body.password = bcrypt.hashSync(req.body.password, 10);
-
          const newUser = await User.create(req.body);
-
+         console.log(newUser)
          res.json(newUser.fullName);
       }
       catch(error) {
-         console.log(error.details[0].message);
-         res.status(500).json(error.details[0].message);
+         console.log(error)
+         // console.log(error.details[0].message);
+         // res.status(500).json(error.details[0].message);
       }
    },
 
    // Update
    update: async (req, res, next) => {
-
       try {
          const userId = req.params.id;
          const rightUser = await User.findByPk(userId);
 
-         if(!!rightUser){
+         if (!!rightUser) {
             await rightUser.update(req.body)
-            res.json("utilisateur modifié" + newUser);
+            return res.json("utilisateur modifié" + newUser);
          }
-         else {
-            next();
-         }
+         else next();
       }
       catch (error) {
          console.trace(error);
@@ -90,13 +86,11 @@ const userController  = {
 
    // Delete
    delete: async (req, res, next) => {
-
       try {
          const userId = req.params.id;
-
          const rightUser = await User.findByPk(userId);
 
-         if(!!rightUser){
+         if (!!rightUser) {
             await rightUser.destroy();
             res.send("utilisateur supprimé")
          }
