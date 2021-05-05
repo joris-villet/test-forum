@@ -4,7 +4,7 @@
 // MODELS
 const User = require('../models/User');
 
-const { userSchema } = require('../validation');
+const { userSchema }  = require('../validation');
 
 const bcrypt = require('bcrypt');
 const Joi = require('joi');
@@ -51,8 +51,12 @@ const userController  = {
    // Create
    create: async (req, res, next) => {
       try {
-         const formValid = Joi.valid(req.body);
-         console.log(formValid)
+         // const formValid = Joi.valid(req.body);
+         // console.log(formValid)
+
+         console.log(req.body);
+
+         await userSchema.validateAsync(req.body);
 
          req.body.password = bcrypt.hashSync(req.body.password, 10);
          const newUser = await User.create(req.body);
@@ -61,8 +65,8 @@ const userController  = {
       }
       catch(error) {
          console.log(error)
-         // console.log(error.details[0].message);
-         // res.status(500).json(error.details[0].message);
+         console.log(error.details[0].message);
+         res.status(500).json(error.details[0].message);
       }
    },
 

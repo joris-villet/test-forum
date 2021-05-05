@@ -1,11 +1,13 @@
 const Topic = require('../models/Topic');
 
+// auth middleware
+const { requireAuth }  = require('../middleware/authMiddleware');
+
 const topicController = {
 
    //READ ALL
    getAllTopic: async (req, res, next) => {
       try {
-         // const topics = await Topic.findAll();
          const topics = await Topic.findAll({
             order: [
                ['createdAt', 'DESC'],
@@ -34,6 +36,7 @@ const topicController = {
 
    // CREATE
    createTopic: async (req, res, next) => {
+      requireAuth();
       try {
          const newTopic = await Topic.create(req.body);
          res.json(newTopic);

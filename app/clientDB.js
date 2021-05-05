@@ -1,6 +1,6 @@
 const Sequelize = require('sequelize');
 
-const client = new Sequelize('forum_dev', 'postgres', 'js4life', {
+const client = new Sequelize(process.env.PGDATABASE, process.env.PGUSER, process.env.PGPASSWORD, {
   host: 'localhost',
   dialect: 'postgres',
   logging: false//passer a true pour voir les différentes requêtes effectuées par l'ORM
@@ -8,9 +8,9 @@ const client = new Sequelize('forum_dev', 'postgres', 'js4life', {
 
 try {
   client.authenticate();
-  console.log('Connection has been established successfully.');
+  console.log('Connection Postgres OK.');
 } catch (error) {
-  console.error('Unable to connect to the database:', error);
+  console.error('Impossible de se connecter à Postgres:', error);
 }
 
 module.exports = client;
