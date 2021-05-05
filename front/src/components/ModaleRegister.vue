@@ -1,38 +1,38 @@
 <template>
 
 <transition name="fade">
-  <div class="bloc-modale" v-if="revele">
+  <div class="bloc-modale" v-if="showModalRegister">
 
     <div class="overlay"></div>
 
       <form class="modale">
-        <div class="close-modale" @click="$emit('closeModalRegister', $event.target)">
+        <div class="close-modale" @click="$emit('close-modal-register', $event.target)">
           <i class="fas fa-window-close close-modale-icon"></i>
         </div>
         <h2 class="title-modale">&#x1F447; Inscription</h2>
         <div>
           <label>
-            <input v-model="firstname" type="text" name="firstname" placeholder="votre prénom" autocomplete="off">
+            <input v-model="formData.firstname" type="text" name="firstname" placeholder="votre prénom" autocomplete="off">
           </label>
         </div>
         <div>
           <label>
-            <input v-model="lastname" type="text" name="lastname" placeholder="votre nom" autocomplete="off">
+            <input v-model="formData.lastname" type="text" name="lastname" placeholder="votre nom" autocomplete="off">
           </label>
         </div>
         <div>
           <label>
-            <input v-model="email" type="text" name="email" placeholder="votre email" autocomplete="off">
+            <input v-model="formData.email" type="text" name="email" placeholder="votre email" autocomplete="off">
           </label>
         </div>
         <div>
           <label>
-            <input v-model="password" type="password" name="password" placeholder="votre mot de passe" autocomplete="off">
+            <input v-model="formData.password" type="password" name="password" placeholder="votre mot de passe" autocomplete="off">
           </label>
         </div>
         <div>
           <label>
-            <input v-model="repeatPassword" type="password" name="repeatPassword" placeholder="confirmez le mot de passe" autocomplete="off">
+            <input v-model="formData.repeatPassword" type="password" name="repeatPassword" placeholder="confirmez le mot de passe" autocomplete="off">
           </label>
         </div>
         <button @click.prevent="submitFormRegister" class="btn" type="submit">Validez</button>
@@ -50,70 +50,45 @@ import axios from 'axios'
 export default {
   name: 'ModaleRegister',
   props: {
-    revele: Boolean
+    showModalRegister: Boolean
   },
   data() {
     return {
-      firstname: '',
-      lastname: '',
-      email: '',
-      password: '',
-      repeatPassword: '',
+      formData: {
+        firstname: '',
+        lastname: '',
+        email: '',
+        password: '',
+        repeatPassword: '',
+      },
       infoModale: false,
       message: '',
     }
   },
    methods: {
      submitFormRegister: async function() {
-        const formData = {
-          firstname: this.firstname,
-          lastname: this.lastname,
-          email: this.email,
-          password: this.password,
-          repeatPassword: this.repeatPassword
-        }
+       
 
         try {
-          const res = await axios.post('http://localhost:3000/api/user', formData);
+          const res = await axios.post('http://localhost:3000/api/user', this.formData);
           const data = await res.data;
           console.log(data)
-          this.revele = true;
           this.firstname = '';
           this.lastname =  '';
           this.email = '';
           this.password =  '';
           this.repeatPassword =  '';
+          this.$emit('close-modal-register');
+          this.infoModale = false;
+          this.formData = {}
         }
         catch (err) {
-          console.log("je suis dans le catch")
-          console.log(err);
-          console.log(err.response)
+          console.log("je suis dans le catch");
+          console.log(err.response.data);
+          this.infoModale = true;
+          this.message = err.response.data;
         }
      }
-    // getFormRegister: function() {
-      
-    //   axios.post('http://localhost:3000/api/user', {
-    //     firstname: this.firstname,
-    //     lastname: this.lastname,
-    //     email: this.email,
-    //     password: this.password,
-    //     repeatPassword: this.repeatPassword
-    //   })
-    //   .then(response => {
-    //     console.log(response.data)
-    //     this.revele = !this.revele;
-    //     this.firstname = '';
-    //     this.lastname =  '';
-    //     this.email = '';
-    //     this.password =  '';
-    //     this.repeatPassword =  '';
-    //   })
-    //   .catch(error => {
-    //     console.log(error.response)
-    //     this.infoModale = true;
-    //     this.message = error.response.data;
-    //   })
-    // },
   }
 }
 </script>

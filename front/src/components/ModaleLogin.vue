@@ -5,18 +5,18 @@
       <div class="overlay"></div>
 
       <form class="modale">
-        <div class="close-modale" @click="$emit('closeModalLogin', $event.target)">
+        <div class="close-modale" @click="$emit('close-modal-login', $event.target); setInput(); setInfoModal()">
           <i class="fas fa-window-close close-modale-icon"></i>
         </div>
         <h2 class="title-modale">&#x1F447; Connexion</h2>
         <div>
           <label>
-            <input v-model="email" type="text" name="email" placeholder="votre email" autocomplete="off">
+            <input v-model="formData.email" @input="setInfoModal" type="text" name="email" placeholder="votre email" autocomplete="off">
           </label>
         </div>
         <div>
           <label>
-            <input v-model="password" type="password" name="password" placeholder="votre mot de passe" autocomplete="off">
+            <input v-model="formData.password" @input="setInfoModal" type="password" name="password" placeholder="votre mot de passe" autocomplete="off">
           </label>
         </div>
         <button @click.prevent="submitForm" class="btn" type="submit">Validez</button>
@@ -37,35 +37,49 @@ export default {
   },
   data() {
     return {
-      email: '',
-      password: '',
+      formData: {
+        email: '',
+        password: ''
+      },
       infoModale: false,
       message: '',
     }
   },
   methods: {
     submitForm: async function() {
-      const formData = {
-        email: this.email,
-        password: this.password,
-      }
-      try {
-        const res = await axios.post('http://localhost:3000/api/login', formData);
-        const data = await res.data;
-        console.log(data)
-        // this.infoModale = true;
-        this.seen = false;
-        this.email = '';
-        this.password = '';
-      }
-      catch (err) {
-        console.log("je suis dans le catch")
-        console.log(err);
-        console.log(err.response)
+     
+      if (this.formData.email === '') {
         this.infoModale = true;
-        this.message = err.response.data;
+        this.message = "le champ email est vide";
+        return;
       }
-      
+      if (this.formData.password === '') {
+        this.infoModale = true;
+        this.message = "le champ password est vide";
+        return;
+      }
+
+        try {
+          const res = await axios.post('http://localhost:3000/api/login', this.formData);
+          const data = await res.data;
+          console.log("data => ", data)
+          this.$emit('close-modal-login');
+          this.infoModale = false;
+          this.formData = {}
+        }
+        catch (err) {
+          console.log("je suis dans le catch")
+          console.log(err);
+          console.log(err.response)
+          this.infoModale = true;
+          this.message = err.response.data;
+        }
+    },
+    setInfoModal() {
+      this.infoModale = false;
+    },
+    setInput() {
+      this.formData = {}
     }
   }
 }

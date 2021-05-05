@@ -5,7 +5,7 @@
         <li @click="openModalRegister">
           S'inscrire
         </li>
-        <li v-if="admin">
+        <li v-if="isLogged" @click="logout">
           Se déconnecter
         </li>
         <li v-else @click="openModalLogin">
@@ -17,22 +17,17 @@
     <!-- ici ma modale d'inscription -->
     <ModaleRegister
       :getFormRegister="getFormRegister"
-      :firstname="firstname"
-      :lastname="lastname" 
-      :email="email" 
-      :password="password"
-      :repeatPassword="repeatPassword"
-      :revele="revele"
-      @closeModalRegister="closeModalRegister"
+      :showModalRegister="showModalRegister"
+      @close-modal-register="closeModalRegister"
     />
 
 
     <!-- ici ma modale de connexion -->
     <ModaleLogin
+      :seen="seen"
       :email="email" 
       :password="password"
-      :seen="seen"
-      @closeModalLogin="closeModalLogin"
+      @close-modal-login="closeModalLogin"
     />
   
     
@@ -40,19 +35,14 @@
 </template>
 
 <script>
+import axios from 'axios'
+
 import ModaleRegister from '../components/ModaleRegister'
 import ModaleLogin from '../components/ModaleLogin'
 
 export default {
   name: 'NavBar',
   components: { ModaleRegister, ModaleLogin },
-  data() {
-    return {
-      admin: false,
-      revele: false,
-      seen: false
-    }
-  },
   props: {
     getFormRegister: Function,
     getFormLogin: Function,
@@ -62,13 +52,44 @@ export default {
     password: String,
     repeatPassword: String,
   },
-
+  data() {
+    return {
+      isLogged: false,
+      showModalRegister: false,
+      seen: false
+    }
+  },
+  updated() {
+    console.log('updated')
+    this.checkCookie();
+  },
   methods: {
+    checkCookie: async function() {
+      try {
+        const res = await axios.get('http://localhost:3000/api/auth-require');
+        const data = res.data;
+        console.log(data)
+      } catch (err) {
+        console.log(err)
+      }
+    },
+    logout: async function() {
+      try {
+        const res = await axios.get('http://localhost:3000/api/logout');
+        const data = await res.data;
+        console.log(data);
+        this.isLogged = false;
+      }
+      catch (err) {
+        console.log("je suis dans le catch")
+        console.log(err);
+      }
+    },
     openModalRegister: function() {
-      this.revele = true;
+      this.showModalRegister = true;
     },
     closeModalRegister: function(){
-      this.revele = false;
+      this.showModalRegister = false;
     },
     openModalLogin: function() {
       this.seen = true;
